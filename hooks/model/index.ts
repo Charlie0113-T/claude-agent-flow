@@ -1,8 +1,10 @@
 export * from './ensure-node'
 export * from './flow-state'
 export * from './on-spawn'
+export * from './on-permission'
 export * from './on-tool'
 export * from './on-turn'
 export * from './prune'
+export * from './reconcile'
 
 export * as default from '.'
