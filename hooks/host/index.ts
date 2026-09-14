@@ -1,3 +1,3 @@
-export * from './host'
+export type * from './host.js'
 
 export * as default from '.'

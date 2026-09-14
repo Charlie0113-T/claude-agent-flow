@@ -84,6 +84,32 @@ describe('rows-of', () => {
     expect(failed?.color).toBe('red')
   })
 
+  test('the call count shows during a call, and one agent is singular', () => {
+    let state = Model.onSpawn(Model.initialState(0), Fixtures.spawnOf('a'), 0)
+    state = Model.onToolStart(state, { agentId: 'a', tool: 'Grep' }, 1000)
+    state = Model.onToolEnd(state, { agentId: 'a', tool: 'Grep', isError: false }, 2000)
+    state = Model.onToolStart(state, { agentId: 'a', tool: 'Read' }, 3000)
+    const rows = Model.rowsOf(state, 4000, NONE)
+
+    expect(rows[0]?.text).toBe('Agent flow · 1 agent · 1 running · 0 waiting')
+    expect(rows.find(row => row.id === 'a')?.text).toBe('└─ ● Explore "task a" 4s · Read 1s ×1')
+  })
+
+  test('unknown, quiet and named nodes render their own glyph, text and color', () => {
+    let state = Model.reconcile(Model.initialState(0), [{ id: 'a', description: 'parked one', type: 'general-purpose', status: 'parked', name: 'scout' }], 1000)
+    state = Model.onSpawn(state, Fixtures.spawnOf('b'), 2000)
+    const rows = Model.rowsOf(state, 3000 + Limits.QUIET_MS, NONE)
+
+    expect(rows.find(row => row.id === 'a')).toMatchObject({ text: '├─ ○ general-purpose scout "parked one" ~2m02s [parked]', color: undefined })
+    expect(rows.find(row => row.id === 'b')).toMatchObject({ text: '└─ ● Explore "task b" 2m01s · quiet 2m', color: 'gray' })
+  })
+
+  test('the header counts unlisted loops', () => {
+    const state = Model.onToolStart(Model.initialState(0), { agentId: 'wf-1', tool: 'Read' }, 1)
+
+    expect(Model.rowsOf(state, 2, NONE)[0]?.text).toBe('Agent flow · 1 agent · 1 running · 0 waiting · 1 unlisted')
+  })
+
   test('with no agents the tree is one dim empty row', () => {
     const rows = Model.rowsOf(Model.initialState(0), 1, NONE)
 

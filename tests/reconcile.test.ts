@@ -28,11 +28,16 @@ describe('reconcile', () => {
   test('the list has the last word on status and fills a missing parent', () => {
     let state = Model.onSpawn(Model.initialState(0), Fixtures.spawnOf('a'), 1)
     state = Model.onTurnComplete(state, { agentId: 'a', reason: 'answer', durationMs: 1 }, 2)
-    state = Model.reconcile(state, [listed('a', 'running')], 3)
+    state = Model.reconcile(state, [listed('a', 'running', 'p')], 3)
 
     expect(Model.nodeOf(state, 'a')?.status).toBe('running')
     expect(Model.nodeOf(state, 'a')?.source).toBe('spawn')
     expect(Model.nodeOf(state, 'a')?.description).toBe('task a')
+    expect(Model.nodeOf(state, 'a')?.parentId).toBe('p')
+
+    state = Model.reconcile(state, [listed('a', 'running', 'q')], 4)
+
+    expect(Model.nodeOf(state, 'a')?.parentId).toBe('p')
   })
 
   test('an unmapped status is kept raw and shown as unknown', () => {
@@ -79,6 +84,21 @@ describe('reconcile', () => {
     expect(Model.nodeOf(state, 'wf-1')?.source).toBe('list')
     expect(Model.nodeOf(state, 'wf-1')?.type).toBe('general-purpose')
     expect(Model.nodeOf(state, 'wf-1')?.description).toBe('listed wf-1')
+  })
+
+  test('an unlisted loop silent for QUIET_MS ages to unknown instead of running forever', () => {
+    let state = Model.onToolStart(Model.initialState(0), { agentId: 'wf-1', tool: 'Read' }, 1)
+    state = Model.onToolEnd(state, { agentId: 'wf-1', tool: 'Read', isError: false }, 2)
+    state = Model.reconcile(state, [], 2 + Limits.QUIET_MS)
+
+    expect(Model.nodeOf(state, 'wf-1')?.status).toBe('running')
+
+    state = Model.reconcile(state, [], 3 + Limits.QUIET_MS)
+
+    expect(Model.nodeOf(state, 'wf-1')?.status).toBe('unknown')
+    expect(Model.nodeOf(state, 'wf-1')?.endedAt).toBe(undefined)
+    expect(Model.countsOf(state).running).toBe(0)
+    expect(state.events.at(-1)?.kind).toBe('quiet')
   })
 
   test('statuses map from the engine\'s words', () => {

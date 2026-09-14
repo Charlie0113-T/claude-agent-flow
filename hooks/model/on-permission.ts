@@ -5,7 +5,8 @@ import { nodeOf, withEvent, withNode } from './flow-state'
 
 /**
  * A permission request: the loop it came from waits for the person until its
- * next tool event or turn end clears it.
+ * next tool event or turn end clears it. A wait raised inside a running tool
+ * call keeps that call's start, so the call's duration survives the wait.
  *
  * @param state the state
  * @param req the request, `agentId` absent for the main loop
@@ -28,7 +29,7 @@ export function onPermission(
   return withEvent(
     withNode(ensured, {
       ...node,
-      activity: { kind: 'permission', tool: req.tool, since: now },
+      activity: { kind: 'permission', tool: req.tool, since: node.activity.kind === 'tool' ? node.activity.since : now },
       lastEventAt: now,
     }),
     {

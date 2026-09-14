@@ -12,12 +12,13 @@ const messageOf = (error: unknown): string => (error instanceof Error ? error.me
 /**
  * Registers the agent flow pane: `/flow` once the command is granted, the
  * pane's drawing, the reducers behind every agent event, the reconcile and
- * tick timers while agents run, the auto-open on the first spawn, and the
- * text fallback where no surface draws the pane.
+ * tick timers while agents run, the auto-open on the first spawn, the reset
+ * on `/clear` and `/resume`, and the text fallback where no surface draws
+ * the pane.
  *
  * `session.start` binds the host every later hook reads through; until it
- * has (or when `/flow` is refused because another plugin holds it) every
- * hook passes its event on untouched.
+ * has (registration refused for any reason, said once over `$.ui.log`)
+ * every hook passes its event on untouched.
  *
  * @param on the engine's registrar
  */
@@ -212,18 +213,20 @@ export function register(on: On) {
       closePane: pane => $.ui.close(pane),
       registerCommand: spec => $.command.register(spec),
     }
-    const now = await engine.now()
+    let now = 0
+
+    try {
+      now = await engine.now()
+    } catch {
+      // now stays 0: the clock itself must not stop /flow from registering.
+    }
 
     state = { ...Model.initialState(now), startedSurface: e.surface }
 
     try {
       await engine.registerCommand({ name: Names.COMMAND_NAME, description: Names.COMMAND_DESCRIPTION })
     } catch (error) {
-      const reason = messageOf(error)
-
-      if (!Names.BUILTIN_HOLDS_PATTERN.test(reason)) {
-        engine.uiLog(`${Names.REGISTER_FAILED_TEXT}${reason}`)
-      }
+      engine.uiLog(`${Names.REGISTER_FAILED_TEXT}${messageOf(error)}`)
 
       return next(e)
     }
@@ -303,7 +306,15 @@ export function register(on: On) {
         return {}
       }
 
-      const isDrawn = await openPane(engine, true)
+      let isDrawn: boolean
+
+      try {
+        isDrawn = await openPane(engine, true)
+      } catch (error) {
+        noteFailure('ui.open', error, now)
+
+        return { text: textTreeOf(now) }
+      }
 
       if (!isDrawn) {
         return { text: textTreeOf(now) }
@@ -316,6 +327,22 @@ export function register(on: On) {
     } catch (error) {
       return { text: `agent flow: ${messageOf(error)}` }
     }
+  })
+
+  on('command.run', { command: ['clear', 'resume'] }, async ($, e, next) => {
+    const engine = host
+
+    if (engine !== null) {
+      try {
+        const now = await engine.now()
+
+        apply(current => Model.resetSession(current, now))
+      } catch (error) {
+        noteFailure('command.run', error, 0)
+      }
+    }
+
+    return next(e)
   })
 
   on('ui.close', ($, e, next) => {

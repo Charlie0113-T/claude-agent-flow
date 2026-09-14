@@ -56,7 +56,7 @@ export function onToolEnd(state: FlowState, call: ToolEnd, now: number): FlowSta
     return state
   }
 
-  const startedAt = node.activity.kind === 'tool' ? node.activity.since : now
+  const startedAt = node.activity.kind === 'tool' || node.activity.kind === 'permission' ? node.activity.since : now
   const recent: RecentTool = { tool: call.tool, startedAt, durationMs: now - startedAt, isError: call.isError }
 
   return withEvent(

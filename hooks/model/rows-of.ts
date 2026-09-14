@@ -29,8 +29,9 @@ const MAX_DEPTH = 8
 export function headerTextOf(state: FlowState): string {
   const counts = countsOf(state)
   const unlisted = counts.unlisted > 0 ? ` · ${counts.unlisted} unlisted` : ''
+  const agents = counts.agents === 1 ? '1 agent' : `${counts.agents} agents`
 
-  return `Agent flow · ${counts.agents} agents · ${counts.running} running · ${counts.waiting} waiting${unlisted}`
+  return `Agent flow · ${agents} · ${counts.running} running · ${counts.waiting} waiting${unlisted}`
 }
 
 function activityTextOf(node: FlowNode, now: number, signal: Signal): string {
@@ -119,7 +120,7 @@ export function nodeTextOf(node: FlowNode, now: number, prefix: string): string 
   return (
     base +
     (activity ? ` · ${activity}` : '') +
-    (activity && node.activity.kind === 'tool' ? '' : calls) +
+    calls +
     (tokens ? ` · ${tokens}` : '') +
     (tag ? ` ${tag}` : '')
   )

@@ -75,4 +75,29 @@ describe('flow-state', () => {
     expect(Model.nodeOf(pruned, 'n0')).toBe(undefined)
     expect(Model.nodeOf(pruned, `n${Limits.MAX_NODES + 4}`)?.status).toBe('running')
   })
+
+  test('prune keeps a completed parent whose child is still running', () => {
+    let state = Model.initialState(0)
+    state = Model.withNode(
+      state,
+      Model.newNode({ id: 'p', parentId: null, source: 'spawn', type: 'x', description: '', status: 'completed', endedAt: 1 }, 1),
+    )
+    state = Model.withNode(state, Model.newNode({ id: 'c', parentId: 'p', source: 'spawn', type: 'x', description: '' }, 2))
+
+    for (let i = 0; i < Limits.MAX_NODES; i += 1) {
+      state = Model.withNode(
+        state,
+        Model.newNode(
+          { id: `n${i}`, parentId: null, source: 'spawn', type: 'x', description: '', status: 'completed', endedAt: i },
+          i,
+        ),
+      )
+    }
+
+    const pruned = Model.prune(state)
+
+    expect(Model.nodeOf(pruned, 'p')).toBeDefined()
+    expect(Model.nodeOf(pruned, 'c')).toBeDefined()
+    expect(pruned.nodes.size).toBe(Limits.MAX_NODES)
+  })
 })

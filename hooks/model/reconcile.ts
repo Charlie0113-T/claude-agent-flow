@@ -48,7 +48,9 @@ export function statusOfListed(raw: string): NodeStatus {
  * Merges what the engine lists into the tree: the list has the last word on
  * status and fills a parent the events never gave; a running spawn- or
  * list-sourced node absent from GONE_AFTER_MISSES lists in a row is gone.
- * Root and event-sourced nodes are never judged absent.
+ * Root and event-sourced nodes are never judged absent, but an event-sourced
+ * (unlisted) node still running with no event for QUIET_MS ages to unknown
+ * instead of pinning the reconcile and tick timers forever.
  *
  * @param state the state
  * @param listed the agents `$.agent.list()` answered
@@ -110,26 +112,32 @@ export function reconcile(state: FlowState, listed: readonly Listed[], now: numb
     const isJudged =
       node.id !== Names.ROOT_ID && node.source !== 'event' && !seen.has(node.id) && node.status === 'running'
 
-    if (!isJudged) {
+    if (isJudged) {
+      const misses = node.misses + 1
+
+      if (misses < Limits.GONE_AFTER_MISSES) {
+        nodes.set(node.id, { ...node, misses })
+        continue
+      }
+
+      nodes.set(node.id, {
+        ...node,
+        misses,
+        status: 'gone',
+        endedAt: now,
+        activity: { kind: 'idle' },
+        lastEventAt: now,
+      })
+      next = withEvent(next, { at: now, kind: 'gone', agentId: node.id, text: `${node.type} left the list` })
       continue
     }
 
-    const misses = node.misses + 1
+    const isQuiet = node.source === 'event' && node.status === 'running' && now - node.lastEventAt > Limits.QUIET_MS
 
-    if (misses < Limits.GONE_AFTER_MISSES) {
-      nodes.set(node.id, { ...node, misses })
-      continue
+    if (isQuiet) {
+      nodes.set(node.id, { ...node, status: 'unknown', activity: { kind: 'idle' }, lastEventAt: now })
+      next = withEvent(next, { at: now, kind: 'quiet', agentId: node.id, text: 'unlisted loop went quiet' })
     }
-
-    nodes.set(node.id, {
-      ...node,
-      misses,
-      status: 'gone',
-      endedAt: now,
-      activity: { kind: 'idle' },
-      lastEventAt: now,
-    })
-    next = withEvent(next, { at: now, kind: 'gone', agentId: node.id, text: `${node.type} left the list` })
   }
 
   return prune({ ...next, nodes })

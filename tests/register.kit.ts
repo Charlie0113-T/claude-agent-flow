@@ -1,4 +1,4 @@
-import { describe, expect, test, tier } from 'claude-code/testing'
+import { describe, expect, mock, test, tier } from 'claude-code/testing'
 
 import Limits from '../hooks/limits'
 import Names from '../hooks/names'
@@ -55,9 +55,15 @@ describe('register', () => {
   test('when another plugin holds /flow, this one stands down', async ($, on) => {
     const logged: string[] = []
 
-    Fixtures.answersEngine(on)
+    mock.clock(on)
+    mock.store(on)
+    on('session.start', ($, e) => ({ cwd: e.cwd }))
     on('command.register', () => ({ deny: 'a command named flow is registered already' }))
     on('command.run', () => ({ text: 'the other /flow ran' }))
+    on('agent.list', () => ({ value: [] }))
+    on('ui.invalidate', () => ({ value: undefined }))
+    on('ui.status', () => ({ value: undefined }))
+
     on('ui.log', ($, e) => {
       logged.push(e.text)
 
@@ -67,6 +73,6 @@ describe('register', () => {
     await $.session.start(SESSION)
 
     expect(await $.command.run(FLOW)).toEqual({ text: 'the other /flow ran' })
-    expect(logged).toEqual([])
+    expect(logged).toEqual([`${Names.REGISTER_FAILED_TEXT}a command named flow is registered already`])
   })
 })
