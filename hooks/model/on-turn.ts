@@ -1,7 +1,7 @@
 import Names from '../names'
 import { ensureNode } from './ensure-node'
 import type { FlowState, NodeStatus } from './flow-state'
-import { nodeOf, withEvent, withNode } from './flow-state'
+import { isTerminal, nodeOf, withEvent, withNode } from './flow-state'
 
 export type TurnTokens = {
   input_tokens: number
@@ -83,7 +83,7 @@ export function onTurnComplete(state: FlowState, turn: TurnComplete, now: number
     withNode(ensured, {
       ...node,
       status,
-      endedAt: isRoot ? node.endedAt : now,
+      endedAt: isRoot ? node.endedAt : isTerminal(status) ? now : undefined,
       turns: node.turns + 1,
       usage,
       activity: { kind: 'idle' },

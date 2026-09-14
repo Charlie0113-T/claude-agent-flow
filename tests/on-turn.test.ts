@@ -58,6 +58,16 @@ describe('on-turn', () => {
     expect(Model.statusOfReason('something')).toBe('unknown')
   })
 
+  test('an unrecognized reason leaves the node unknown and without an end time', () => {
+    let state = Model.onSpawn(Model.initialState(0), Fixtures.spawnOf('a'), 1)
+    state = Model.onTurnComplete(state, { agentId: 'a', reason: 'something', durationMs: 1 }, 5)
+    const node = Model.nodeOf(state, 'a')
+
+    expect(node?.status).toBe('unknown')
+    expect(node?.endedAt).toBe(undefined)
+    expect(node?.turns).toBe(1)
+  })
+
   test('a turn of an unknown loop creates an event-sourced node that is then finished', () => {
     const state = Model.onTurnComplete(Model.initialState(0), { agentId: 'wf-9', reason: 'answer', durationMs: 1 }, 5)
 
