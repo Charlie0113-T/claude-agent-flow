@@ -1,0 +1,4 @@
+{
+  "description": "The agent flow pane: /flow toggles a pane drawing the session's subagent tree from agent.spawn, tool.call and turn.complete, reconciled with agent.list while agents run; /flow text prints the same tree",
+  "modules": ["./register.ts"]
+}
