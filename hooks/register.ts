@@ -30,13 +30,7 @@ export function register(on: On) {
   const timers = new Map<'reconcile' | 'tick', Timer>()
 
   function isAnythingRunning(): boolean {
-    for (const node of state.nodes.values()) {
-      if (node.id !== Names.ROOT_ID && node.status === 'running') {
-        return true
-      }
-    }
-
-    return false
+    return Model.countsOf(state).running > 0
   }
 
   function redraw(): void {
@@ -286,52 +280,60 @@ export function register(on: On) {
       return next(e)
     }
 
-    const now = await engine.now()
-    const args = e.args.trim()
+    try {
+      const now = await engine.now()
+      const args = e.args.trim()
 
-    if (args === 'text') {
-      return { text: textTreeOf(now) }
-    }
+      if (args === 'text') {
+        return { text: textTreeOf(now) }
+      }
 
-    if (args !== '') {
-      return { text: Names.USAGE_TEXT }
-    }
+      if (args !== '') {
+        return { text: Names.USAGE_TEXT }
+      }
 
-    const wasDrawnWhenProbed = state.pane.isBelievedOpen && (await probeDrawn(engine))
-    const toggle = PaneToggle.paneToggleOf({ isBelievedOpen: state.pane.isBelievedOpen, wasDrawnWhenProbed })
+      const wasDrawnWhenProbed = state.pane.isBelievedOpen && (await probeDrawn(engine))
+      const toggle = PaneToggle.paneToggleOf({ isBelievedOpen: state.pane.isBelievedOpen, wasDrawnWhenProbed })
 
-    if (toggle === 'close') {
-      await closePane(engine)
-      storedOpen = false
-      await engine.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+      if (toggle === 'close') {
+        await closePane(engine)
+        storedOpen = false
+        await engine.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+
+        return {}
+      }
+
+      const isDrawn = await openPane(engine, true)
+
+      if (!isDrawn) {
+        return { text: textTreeOf(now) }
+      }
+
+      storedOpen = true
+      await engine.storeSet(Names.STORE_OPEN_KEY, true).catch(() => undefined)
 
       return {}
+    } catch (error) {
+      return { text: `agent flow: ${messageOf(error)}` }
     }
-
-    const isDrawn = await openPane(engine, true)
-
-    if (!isDrawn) {
-      return { text: textTreeOf(now) }
-    }
-
-    storedOpen = true
-    await engine.storeSet(Names.STORE_OPEN_KEY, true).catch(() => undefined)
-
-    return {}
   })
 
   on('ui.close', ($, e, next) => {
-    if (e.id === Names.PANE_ID) {
-      const isByPerson = e.origin.kind === 'person'
+    try {
+      if (e.id === Names.PANE_ID) {
+        const isByPerson = e.origin.kind === 'person'
 
-      state = Model.withPane(state, { isBelievedOpen: false, ...(isByPerson ? { closedByPerson: true } : {}) })
+        state = Model.withPane(state, { isBelievedOpen: false, ...(isByPerson ? { closedByPerson: true } : {}) })
 
-      if (isByPerson) {
-        storedOpen = false
-        void host?.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+        if (isByPerson) {
+          storedOpen = false
+          void host?.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+        }
+
+        syncStatus()
       }
-
-      syncStatus()
+    } catch (error) {
+      noteFailure('ui.close', error, 0)
     }
 
     return next(e)
