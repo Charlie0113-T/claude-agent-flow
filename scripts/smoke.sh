@@ -29,7 +29,7 @@ debug = open(sys.argv[2], encoding='utf-8', errors='replace').read()
 checks = {
     'pane header drawn': 'Agent flow ·' in clean,
     'a general-purpose node': re.search(r'└─ [●✓✗◐○] general-purpose', clean) is not None,
-    'a nested Explore node': re.search(r'   └─ [●✓✗◐○] Explore', clean) is not None,
+    'a nested Explore node': re.search(r'(   |│  )└─ [●✓✗◐○] Explore', clean) is not None,
     'a node finished': '✓' in clean,
     'module loaded': 'hooks module agent-flow loaded' in debug,
     'command ran': 'hooks module agent-flow command.run settled' in debug,

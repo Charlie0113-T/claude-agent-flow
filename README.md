@@ -7,7 +7,9 @@ what it is doing right now (a tool call and how long it has run, or a wait
 for the person's approval), its call count, and its tokens once it finished.
 A `[+]` on a row expands its details: model, prompt excerpt, recent tool
 calls, tokens. Agents waiting for approval are highlighted; a tool call over
-30 seconds and a running agent silent for two minutes are marked too.
+30 seconds and a running agent silent for two minutes are marked too. A wait
+for approval stays shown until the approved tool call ends, since no engine
+event carries the person's answer.
 
 The tree comes from engine events (`agent.spawn`, `tool.call`,
 `turn.complete`, the classic permission events) and is reconciled with
@@ -17,8 +19,8 @@ a collapsed "unlisted loops" group so they never vanish silently.
 
 Where the surface cannot draw a pane (a `-p` run, the VS Code extension as
 of 2.1.270) `/flow` prints the same tree as text; `/flow text` always prints
-it. On a terminal narrower than 110 columns the pane sits inline above the
-prompt and shows only the rows that need attention. The first spawn of a
+it. When the surface seats the pane inline above the prompt (narrow
+terminals) it shows only the rows that need attention. The first spawn of a
 session opens the pane by itself on a terminal of 144 columns or more (110
 when you kept it open before), unless you closed it.
 
@@ -33,6 +35,7 @@ enabled; see `mods/README.md`.
 | `ui.render` of `PromptHint` | Reads the terminal's width for the auto-open decision. |
 | `ui.render` of `Pane` | Draws the pane: header, root, tree, unlisted group, last event; the inline summary when seated above the prompt. |
 | `command.run` of `flow` | Toggles the pane, printing the text tree where no surface draws it; `text` prints it outright. |
+| `command.run` of `clear`, `resume` | Forgets the tree; the pane's state is kept. |
 | `ui.close` | Forgets an open pane the person closed, and remembers not to auto-open again. |
 | `agent.spawn` | Adds the new agent under its parent; opens the pane on the session's first spawn. |
 | `tool.call` | Marks the loop busy in the tool, then counts the call and its duration. |
