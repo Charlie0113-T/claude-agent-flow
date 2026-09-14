@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "es2023",
-    "lib": ["es2023"],
+    "lib": [
+      "es2023"
+    ],
     "types": [],
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -12,8 +14,19 @@
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "paths": { "claude-code/testing": ["./bun/kit.ts"] }
+    "paths": {
+      "claude-code/testing": [
+        "./bun/kit.ts"
+      ]
+    }
   },
-  "include": [".claude/types", "../types/claude-code.d.ts", "hooks", "tests", "bun"],
-  "exclude": ["tests/*.kit.ts"]
+  "include": [
+    "vendor",
+    "hooks",
+    "tests",
+    "bun"
+  ],
+  "exclude": [
+    "tests/*.kit.ts"
+  ]
 }

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "claude-agent-flow",
+  "version": "1.0.0",
+  "description": "agent-flow: a live tree of the session's subagents beside the transcript, as a Claude Code mod",
+  "owner": {
+    "name": "Charles Tao"
+  },
+  "plugins": [
+    {
+      "name": "agent-flow",
+      "description": "/flow opens a live, read-only tree of the session's subagents and teammates beside the transcript: status, current tool call, waits for approval, elapsed time, tokens; prints the same tree as text where no pane can be drawn",
+      "version": "0.1.0",
+      "author": {
+        "name": "Charles Tao"
+      },
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

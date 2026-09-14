@@ -2,5 +2,8 @@
   "name": "agent-flow",
   "version": "0.1.0",
   "description": "The agent flow pane: /flow opens a live tree of the session's subagents and teammates beside the transcript, fed by engine events, with a text fallback where no pane can be drawn.",
-  "author": { "name": "Charles Tao" }
+  "author": {
+    "name": "Charles Tao"
+  },
+  "homepage": "https://github.com/Charlie0113-T/claude-agent-flow"
 }

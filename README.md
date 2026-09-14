@@ -48,11 +48,20 @@ enabled; see `mods/README.md`.
 `command.register`, `store.get`, `store.set`, `ui.close`, `ui.invalidate`,
 `ui.log`, `ui.open`, `ui.resolve`, `ui.status`.
 
-## Try it
+## Install
+
+From the standalone repository (Charlie0113-T/claude-agent-flow):
+
+    claude plugin marketplace add Charlie0113-T/claude-agent-flow
+    claude plugin install agent-flow@claude-agent-flow
+
+or, for one session from a checkout:
 
     claude --plugin-dir /path/to/agent-flow
 
-then `/flow`, and ask Claude to use the Agent tool.
+then `/flow`, and ask Claude to use the Agent tool. In the VS Code extension
+`/flow` prints the tree as text; the extension has its own agent map since
+2.1.269, this mod is the terminal's counterpart.
 
 ## Tests
 
@@ -63,3 +72,17 @@ then `/flow`, and ask Claude to use the Agent tool.
 
 `tests/register.kit.ts` is written for `claude plugin test`; rename it to
 `register.test.ts` once that command ships.
+
+## Development
+
+The mod is developed as `mods/agent-flow` in the fork
+Charlie0113-T/ARRS-claude-code, next to the built-in mods, and mirrored to
+the standalone repository with `scripts/sync-standalone.sh` (a `git subtree
+push` of this folder). `vendor/claude-code.d.ts` is a copy of the engine's
+declarations so the standalone checkout typechecks on its own; the sync
+script refreshes it from `mods/types`, and `/plugin-types` writes a current
+one into `.claude/types` in any Claude Code session.
+
+## License
+
+Apache License 2.0, see `LICENSE`. Copyright 2026 Charles Tao.
