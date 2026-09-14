@@ -1,0 +1,54 @@
+#!/usr/bin/expect -f
+# Drives an interactive claude session with the mod loaded, in a 170-column
+# pseudo terminal: opens /flow, dispatches a general-purpose agent that in
+# turn dispatches an Explore agent, waits, closes the pane, exits. Every wait
+# keeps reading the pty (a Claude Code session blocks on a full terminal
+# buffer). Text and Enter go separately so a burst is not read as a paste.
+#
+# usage: expect smoke.exp <plugin dir> <work dir> <out dir>
+set plugin [lindex $argv 0]
+set work [lindex $argv 1]
+set out [lindex $argv 2]
+set env(TERM) "xterm-256color"
+foreach v {CLAUDE_CODE_CHILD_SESSION CLAUDECODE CLAUDE_CODE_ENTRYPOINT CLAUDE_CODE_SSE_PORT CLAUDE_CODE_REMOTE CLAUDE_CODE_SESSION_ATTENDED CLAUDE_CODE_MESSAGING_SOCKET CLAUDE_CODE_MESSAGING_TOKEN CLAUDE_CODE_SESSION_ID CLAUDE_PID CLAUDE_CODE_EXECPATH CLAUDE_CODE_ENABLE_TASKS CLAUDE_EFFORT CLAUDE_AGENT_SDK_VERSION CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING} {
+  catch {unset env($v)}
+}
+proc drain {secs} {
+  expect -timeout $secs timeout {} eof { puts "\n>>> eof during drain"; exit 0 }
+}
+proc type_line {text} {
+  send -- $text
+  drain 1
+  send "\r"
+}
+proc type_command {text} {
+  type_line $text
+  drain 2
+  send "\r"
+}
+cd $work
+log_file -noappend "$out/smoke.raw"
+spawn -noecho claude --plugin-dir $plugin --debug-file "$out/smoke-debug.txt"
+stty rows 45 columns 170 < $spawn_out(slave,name)
+set timeout 8
+expect {
+  -re {(?i)trust} { sleep 1; send "\033\[B"; sleep 1; send "\r"; puts "\n>>> trust dialog answered" }
+  timeout { puts "\n>>> no trust dialog" }
+}
+drain 12
+puts "\n>>> /flow"
+type_command "/flow"
+drain 8
+puts "\n>>> prompt"
+type_line "Use the Agent tool with subagent_type general-purpose and this exact prompt: Use the Agent tool with subagent_type Explore to count how many .ts files are under the hooks directory, then reply with only that number. When it returns, reply with only the number."
+drain 120
+puts "\n>>> closing"
+type_command "/flow"
+drain 4
+puts "\n>>> exiting"
+type_command "/exit"
+set timeout 20
+expect {
+  eof { puts "\n>>> session exited" }
+  timeout { send "\003"; sleep 1; send "\003"; expect { eof {} timeout {} }; puts "\n>>> forced exit" }
+}

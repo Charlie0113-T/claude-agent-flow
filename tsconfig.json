@@ -14,5 +14,6 @@
     "jsxFragmentFactory": "Fragment",
     "paths": { "claude-code/testing": ["./bun/kit.ts"] }
   },
-  "include": [".claude/types", "../types/claude-code.d.ts", "hooks", "tests", "bun"]
+  "include": [".claude/types", "../types/claude-code.d.ts", "hooks", "tests", "bun"],
+  "exclude": ["tests/*.kit.ts"]
 }
