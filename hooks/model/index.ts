@@ -8,6 +8,7 @@ export * from './on-tool'
 export * from './on-turn'
 export * from './prune'
 export * from './reconcile'
+export * from './rows-of'
 export * from './signal-of'
 export * from './tokens-text-of'
 
