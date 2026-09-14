@@ -6,7 +6,12 @@ import Fixtures from './fixtures'
 
 tier('user')
 
-const FLOW = { command: Names.COMMAND_NAME, args: '', origin: { kind: 'composer' as const } }
+const FLOW = {
+  command: Names.COMMAND_NAME,
+  args: '',
+  origin: { kind: 'composer' as const },
+  presentation: { isFullscreen: true, columns: 160 },
+}
 const SESSION = { surface: 'terminal' as const, isInteractive: true, cwd: '/work' }
 
 describe('register', () => {
