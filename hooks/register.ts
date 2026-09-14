@@ -10,6 +10,19 @@ import Views from './views'
 const messageOf = (error: unknown): string => (error instanceof Error ? error.message : String(error))
 
 /**
+ * Runs an engine call that must not fail the caller: its rejection or throw
+ * answers `fallback`. Engine calls are awaited, never chained with .catch,
+ * because the live engine's answers are awaitable but not Promises.
+ */
+async function quietly<T>(work: () => PromiseLike<T> | T, fallback: T): Promise<T> {
+  try {
+    return await work()
+  } catch {
+    return fallback
+  }
+}
+
+/**
  * Registers the agent flow pane: `/flow` once the command is granted, the
  * pane's drawing, the reducers behind every agent event, the reconcile and
  * tick timers while agents run, the auto-open on the first spawn, the reset
@@ -125,7 +138,7 @@ export function register(on: On) {
 
       apply(current => Model.reconcile(current, listed, now))
     } catch (error) {
-      noteFailure('agent.list', error, await engine.now().catch(() => 0))
+      noteFailure('agent.list', error, await quietly(() => engine.now(), 0))
     }
   }
 
@@ -148,7 +161,7 @@ export function register(on: On) {
     const isDrawn = await probeDrawn(engine)
 
     if (!isDrawn) {
-      await engine.closePane({ id: Names.PANE_ID }).catch(() => undefined)
+      await quietly(() => engine.closePane({ id: Names.PANE_ID }), undefined)
       state = Model.withPane(state, { isBelievedOpen: false })
     }
 
@@ -213,13 +226,7 @@ export function register(on: On) {
       closePane: pane => $.ui.close(pane),
       registerCommand: spec => $.command.register(spec),
     }
-    let now = 0
-
-    try {
-      now = await engine.now()
-    } catch {
-      // now stays 0: the clock itself must not stop /flow from registering.
-    }
+    const now = await quietly(() => engine.now(), 0)
 
     state = { ...Model.initialState(now), startedSurface: e.surface }
 
@@ -232,7 +239,7 @@ export function register(on: On) {
     }
 
     host = engine
-    storedOpen = await engine.storeGet(Names.STORE_OPEN_KEY).catch(() => undefined)
+    storedOpen = await quietly(() => engine.storeGet(Names.STORE_OPEN_KEY), undefined)
     await reconcileNow()
 
     return next(e)
@@ -270,7 +277,7 @@ export function register(on: On) {
 
       return Views.paneView({ Box, Text, Button }, rows, { onToggle: toggleExpanded })
     } catch (error) {
-      noteFailure('ui.render', error, await $.clock.now().catch(() => 0))
+      noteFailure('ui.render', error, await quietly(() => $.clock.now(), 0))
 
       return next(e)
     }
@@ -301,7 +308,7 @@ export function register(on: On) {
       if (toggle === 'close') {
         await closePane(engine)
         storedOpen = false
-        await engine.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+        await quietly(() => engine.storeSet(Names.STORE_OPEN_KEY, false), undefined)
 
         return {}
       }
@@ -321,7 +328,7 @@ export function register(on: On) {
       }
 
       storedOpen = true
-      await engine.storeSet(Names.STORE_OPEN_KEY, true).catch(() => undefined)
+      await quietly(() => engine.storeSet(Names.STORE_OPEN_KEY, true), undefined)
 
       return {}
     } catch (error) {
@@ -354,7 +361,12 @@ export function register(on: On) {
 
         if (isByPerson) {
           storedOpen = false
-          void host?.storeSet(Names.STORE_OPEN_KEY, false).catch(() => undefined)
+
+          const engine = host
+
+          if (engine !== null) {
+            void quietly(() => engine.storeSet(Names.STORE_OPEN_KEY, false), undefined)
+          }
         }
 
         syncStatus()
@@ -397,7 +409,7 @@ export function register(on: On) {
       )
       await maybeAutoOpen(engine)
     } catch (error) {
-      noteFailure('agent.spawn', error, await engine.now().catch(() => 0))
+      noteFailure('agent.spawn', error, await quietly(() => engine.now(), 0))
     }
 
     return result
