@@ -31,3 +31,5 @@ const Fragment = (props: { children?: unknown[] }): Element => ({
 })
 
 Object.assign(globalThis, { h, Fragment })
+
+export {}
