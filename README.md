@@ -1,3 +1,5 @@
+> **Note:** I'm still a student, so I may not be able to respond to issues or ship updates right away. I'll keep maintaining this plugin in my spare time as best I can.
+
 # agent-flow
 
 The agent flow pane as a plugin: `/flow` opens a live tree of the session's
