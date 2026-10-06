@@ -40,6 +40,7 @@ export type FlowNode = {
   background?: boolean
   fork?: boolean
   promptExcerpt?: string
+  chatTail?: string
   status: NodeStatus
   rawStatus?: string
   spawnedAt?: number

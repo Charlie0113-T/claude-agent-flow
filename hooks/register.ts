@@ -444,6 +444,30 @@ export function register(on: On) {
     return result
   })
 
+  // Streamed text is folded into the model without a redraw per chunk; the
+  // next redraw (a tool call, the reconcile timer) shows it.
+  on('turn.step', async function* ($, e, next) {
+    const stream = next(e)
+    let step = await stream.next()
+
+    while (step.done !== true) {
+      const chunk = step.value
+
+      if (chunk.kind === 'text' && host !== null) {
+        try {
+          state = Model.onText(state, { agentId: e.agentId, text: chunk.text }, await host.now())
+        } catch (error) {
+          noteFailure('turn.step', error, 0)
+        }
+      }
+
+      yield chunk
+      step = await stream.next()
+    }
+
+    return step.value
+  })
+
   on('turn.start', async ($, e, next) => {
     const engine = host
 

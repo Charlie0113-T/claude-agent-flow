@@ -12,3 +12,7 @@ export const PROMPT_EXCERPT_CHARS = 120
 export const RECENT_TOOLS = 5
 /** How many events the ring buffer keeps. */
 export const EVENT_LOG_SIZE = 50
+/** How many characters of an agent's streamed text a node keeps. */
+export const CHAT_TAIL_CHARS = 600
+/** How many lines of that text an expanded node shows. */
+export const CHAT_TAIL_LINES = 3
