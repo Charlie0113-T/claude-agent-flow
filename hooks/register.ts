@@ -455,7 +455,11 @@ export function register(on: On) {
 
       if (chunk.kind === 'text' && host !== null) {
         try {
-          state = Model.onText(state, { agentId: e.agentId, text: chunk.text }, await host.now())
+          // Read the clock first: `state` must be read after the last await, or a
+          // concurrent agent's update made meanwhile is overwritten.
+          const now = await host.now()
+
+          state = Model.onText(state, { agentId: e.agentId, text: chunk.text }, now)
         } catch (error) {
           noteFailure('turn.step', error, 0)
         }

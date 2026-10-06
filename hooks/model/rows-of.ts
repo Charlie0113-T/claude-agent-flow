@@ -133,7 +133,7 @@ function chatLinesOf(node: FlowNode): string[] {
     .filter(line => line !== '')
     .slice(-Limits.CHAT_TAIL_LINES)
 
-  return lines.map(line => `says ${cut(line)}`)
+  return lines.map(line => `says ${line.length > Limits.CHAT_LINE_CHARS ? `${line.slice(0, Limits.CHAT_LINE_CHARS - 1)}…` : line}`)
 }
 
 /**

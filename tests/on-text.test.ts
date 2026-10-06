@@ -34,6 +34,7 @@ describe('on-text', () => {
     const node = Model.nodeOf(state, 'a')
 
     expect(node && Model.detailsOf(node).filter(line => line.startsWith('says '))).toEqual([
+      'says one',
       'says two',
       'says three',
       'says four',
