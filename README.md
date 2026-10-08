@@ -8,10 +8,10 @@ again. Each row is one agent: status, type, name, description, elapsed time,
 what it is doing right now (a tool call and how long it has run, or a wait
 for the person's approval), its call count, and its tokens once it finished.
 A `[+]` on a row expands its details: model, prompt excerpt, the last lines
-the agent wrote, recent tool calls, tokens. Agents waiting for approval are highlighted; a tool call over
-30 seconds and a running agent silent for two minutes are marked too. A wait
-for approval stays shown until the approved tool call ends, since no engine
-event carries the person's answer.
+the agent wrote, recent tool calls, tokens. Agents waiting for approval are
+highlighted; a tool call over 30 seconds and a running agent silent for two
+minutes are marked too. A wait for approval stays shown until the approved
+tool call ends, since no engine event carries the person's answer.
 
 The tree comes from engine events (`agent.spawn`, `tool.call`,
 `turn.complete`, the classic permission events) and is reconciled with
@@ -75,19 +75,6 @@ then `/flow`, and ask Claude to use the Agent tool. In the VS Code extension
 
 `tests/register.kit.ts` is written for `claude plugin test`; rename it to
 `register.test.ts` once that command ships.
-
-To check the streamed-text hook in a real session, use a function-hooks-enabled
-Claude Code build and load this checkout with `--plugin-dir`:
-
-1. Open `/flow` and ask for a general-purpose agent that calls an Explore
-   agent. Have each agent write text, call a tool, and then write more text.
-2. Expand their `[+]` details. Each new text block should start on its own
-   line, while streamed pieces within a block stay together. The details keep
-   1,500 characters and show up to six non-empty lines, at 200 characters per line.
-3. Run `/compact` once, then inspect `/flow` and `/flow text`. Record whether
-   compaction appears under "unlisted loops", the Claude Code version, and any
-   hook errors from `--debug-file`. This requires a live authenticated session;
-   the unit tests cannot establish how the engine lists its compaction loop.
 
 ## Development
 
