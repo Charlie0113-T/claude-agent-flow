@@ -444,6 +444,43 @@ export function register(on: On) {
     return result
   })
 
+  // A subagent's streamed text is folded into the model without a redraw per
+  // chunk; the next redraw (the tick while agents run, any other event) shows
+  // it. The main loop's text is the transcript's own: its steps pass through.
+  on('turn.step', async function* ($, e, next) {
+    const agentId = e.agentId
+    const engine = host
+
+    if (agentId === undefined || engine === null) {
+      return yield* next(e)
+    }
+
+    const stream = next(e)
+    let textIndex: number | undefined = undefined
+
+    for await (const chunk of stream) {
+      if (chunk.kind === 'text') {
+        const startsBlock = chunk.index !== textIndex
+
+        textIndex = chunk.index
+
+        try {
+          // Read the clock first: `state` must be read after the last await, or a
+          // concurrent agent's update made meanwhile is overwritten.
+          const now = await engine.now()
+
+          state = Model.onText(state, { agentId, text: chunk.text, startsBlock }, now)
+        } catch (error) {
+          noteFailure('turn.step', error, 0)
+        }
+      }
+
+      yield chunk
+    }
+
+    return await stream.result
+  })
+
   on('turn.start', async ($, e, next) => {
     const engine = host
 

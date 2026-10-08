@@ -126,9 +126,19 @@ export function nodeTextOf(node: FlowNode, now: number, prefix: string): string 
   )
 }
 
+function chatLinesOf(node: FlowNode): string[] {
+  const lines = (node.chatTail ?? '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line !== '')
+    .slice(-Limits.CHAT_TAIL_LINES)
+
+  return lines.map(line => `says ${line.length > Limits.CHAT_LINE_CHARS ? `${line.slice(0, Limits.CHAT_LINE_CHARS - 1)}…` : line}`)
+}
+
 /**
- * The lines under an expanded node: model and mode, prompt excerpt, recent
- * tool calls, tokens, id.
+ * The lines under an expanded node: model and mode, prompt excerpt, the last
+ * lines it wrote, recent tool calls, tokens, id.
  *
  * @param node the node
  * @returns the lines, unindented
@@ -145,6 +155,7 @@ export function detailsOf(node: FlowNode): string[] {
   return [
     `model ${node.model ?? '?'} · ${mode}`,
     ...(node.promptExcerpt ? [`prompt ${node.promptExcerpt}`] : []),
+    ...chatLinesOf(node),
     ...tools,
     `tokens in ${node.usage.input} out ${node.usage.output} cache ${node.usage.cacheRead}/${node.usage.cacheWrite}`,
     `id ${node.id}`,
