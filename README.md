@@ -76,6 +76,19 @@ then `/flow`, and ask Claude to use the Agent tool. In the VS Code extension
 `tests/register.kit.ts` is written for `claude plugin test`; rename it to
 `register.test.ts` once that command ships.
 
+To check the streamed-text hook in a real session, use a function-hooks-enabled
+Claude Code build and load this checkout with `--plugin-dir`:
+
+1. Open `/flow` and ask for a general-purpose agent that calls an Explore
+   agent. Have each agent write text, call a tool, and then write more text.
+2. Expand their `[+]` details. Each new text block should start on its own
+   line, while streamed pieces within a block stay together. The details keep
+   1,500 characters and show up to six non-empty lines, at 200 characters per line.
+3. Run `/compact` once, then inspect `/flow` and `/flow text`. Record whether
+   compaction appears under "unlisted loops", the Claude Code version, and any
+   hook errors from `--debug-file`. This requires a live authenticated session;
+   the unit tests cannot establish how the engine lists its compaction loop.
+
 ## Development
 
 The mod is developed as `mods/agent-flow` in the fork

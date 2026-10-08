@@ -27,6 +27,21 @@ describe('on-text', () => {
     expect(Model.onText(state, { text: 'hi' }, 1)).toBe(state)
   })
 
+  test('a new text block starts a new line, so one step\'s text does not run into the next', () => {
+    let state = Model.onSpawn(Model.initialState(0), Fixtures.spawnOf('a'), 1)
+
+    state = Model.onText(state, { agentId: 'a', text: 'I\'ll list the files.', startsBlock: true }, 2)
+    state = Model.onText(state, { agentId: 'a', text: 'Now reading ', startsBlock: true }, 3)
+    state = Model.onText(state, { agentId: 'a', text: 'the config.' }, 4)
+    const node = Model.nodeOf(state, 'a')
+
+    expect(node?.chatTail).toBe('I\'ll list the files.\nNow reading the config.')
+    expect(node && Model.detailsOf(node).filter(line => line.startsWith('says '))).toEqual([
+      'says I\'ll list the files.',
+      'says Now reading the config.',
+    ])
+  })
+
   test('an expanded node shows the last lines it wrote', () => {
     let state = Model.onSpawn(Model.initialState(0), Fixtures.spawnOf('a'), 1)
 
