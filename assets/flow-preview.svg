@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="216" viewBox="0 0 860 216" role="img" aria-labelledby="flow-preview-title flow-preview-desc">
+  <title id="flow-preview-title">agent-flow: /flow text</title>
+  <desc id="flow-preview-desc">A terminal window titled &quot;claude — /flow text&quot; showing the tree agent-flow prints for four subagents: two in a tool call, one waiting for approval and one finished with its token count.</desc>
+
+  <!-- Window -->
+  <rect x="0.5" y="0.5" width="859" height="215" rx="10" fill="#1e1e1e"/>
+  <path d="M0.5 36V10.5a10 10 0 0 1 10-10h839a10 10 0 0 1 10 10V36z" fill="#2b2b2b"/>
+  <path d="M0.5 36.5h859" stroke="#161616"/>
+  <circle cx="20" cy="18" r="6" fill="#ff5f57"/>
+  <circle cx="40" cy="18" r="6" fill="#febc2e"/>
+  <circle cx="60" cy="18" r="6" fill="#28c840"/>
+  <text x="430" y="22.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#9a9a9a">claude — /flow text</text>
+
+  <!-- The output of /flow text, one text element per line, exactly as printed.
+       It is plain text, so every line is in the terminal's one foreground
+       colour. Tree units, status glyphs and the text after them sit on an
+       8.43px column grid (14px Menlo), so the columns hold even where a
+       glyph comes from a fallback font. -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#d4d4d4">
+    <text xml:space="preserve" x="20" y="68">Agent flow · 4 agents · 3 running · 1 waiting</text>
+    <text xml:space="preserve" x="20" y="89">main · busy · Agent 26s</text>
+    <text xml:space="preserve" y="110"><tspan x="20">├─ </tspan><tspan x="45.29">● </tspan><tspan x="62.15">general-purpose &quot;Migrate auth to refresh tokens&quot; 1m14s · WebSearch 12s ×6</tspan></text>
+    <text xml:space="preserve" y="131"><tspan x="20">│  </tspan><tspan x="45.29">└─ </tspan><tspan x="70.58">✓ </tspan><tspan x="87.44">Explore &quot;Find verifyToken call sites&quot; 21s ×9 · 18.6k tok</tspan></text>
+    <text xml:space="preserve" y="152"><tspan x="20">├─ </tspan><tspan x="45.29">◐ </tspan><tspan x="62.15">general-purpose &quot;Update the auth test suite&quot; 26s · waiting for approval: Bash ×4</tspan></text>
+    <text xml:space="preserve" y="173"><tspan x="20">└─ </tspan><tspan x="45.29">● </tspan><tspan x="62.15">Explore &quot;Audit session cookie flags&quot; 25s · Read 1s ×7</tspan></text>
+    <text xml:space="preserve" x="20" y="194">last: tool.call a5c07e3b9d1f8a264 Read started</text>
+  </g>
+
+  <!-- Border, drawn last so it sits over the title bar's edge -->
+  <rect x="0.5" y="0.5" width="859" height="215" rx="10" fill="none" stroke="#3c3c3c"/>
+</svg>

@@ -1,6 +1,22 @@
-> **Note:** I'm still a student, so I may not be able to respond to issues or ship updates right away. I'll keep maintaining this plugin in my spare time as best I can.
+<div align="center">
 
 # agent-flow
+
+A live tree of the session's subagents beside the transcript, as a Claude Code mod.
+
+<a href="https://code.claude.com/docs/en/plugins/overview"><img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat&logo=claude&logoColor=white"></a>
+<a href="https://github.com/Charlie0113-T/claude-agent-flow/blob/main/.claude-plugin/plugin.json"><img alt="Plugin version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FCharlie0113-T%2Fclaude-agent-flow%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&prefix=v&color=blue&style=flat"></a>
+<a href="https://github.com/Charlie0113-T/claude-agent-flow/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Charlie0113-T/claude-agent-flow?style=flat"></a>
+<a href="https://bun.com"><img alt="Bun test runner" src="https://img.shields.io/badge/Bun-test_runner-6e7681?style=flat&logo=bun&logoColor=white"></a>
+<a href="https://www.typescriptlang.org/"><img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat&logo=typescript&logoColor=white"></a>
+<a href="https://github.com/Charlie0113-T/claude-agent-flow"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Charlie0113-T/claude-agent-flow?style=flat"></a>
+
+<p><img src="assets/flow-preview.svg" alt="What /flow text prints: the session's subagents as a tree, each with its status, what it is doing and its elapsed time"></p>
+
+</div>
+
+> [!NOTE]
+> I'm still a student, so I may not be able to respond to issues or ship updates right away. I'll keep maintaining this plugin in my spare time as best I can.
 
 The agent flow pane as a plugin: `/flow` opens a live tree of the session's
 subagents and in-process teammates beside the transcript, and closes it
@@ -65,6 +81,32 @@ or, for one session from a checkout:
 then `/flow`, and ask Claude to use the Agent tool. In the VS Code extension
 `/flow` prints the tree as text; the extension has its own agent map since
 2.1.269, this mod is the terminal's counterpart.
+
+## Listed on
+
+**Directories:**
+[claude-mods.com](https://claude-mods.com/agent-flow/),
+[claudemod.com](https://www.claudemod.com/mods/agent-flow),
+[claudemods.ai](https://claudemods.ai/mods/agent-flow),
+[claudemods.chat](https://claudemods.chat/#agent-flow),
+[claudemods.dev](https://claudemods.dev/en/builds/agent-flow-fc840b),
+[claudepluginhub.com](https://www.claudepluginhub.com/plugins/charlie0113-t-agent-flow),
+[mods.aidojo.si](https://mods.aidojo.si/#Charlie0113-T--claude-agent-flow--agent-flow),
+[mods.guide](https://mods.guide/en/mods/picks/),
+[shrwnsan.github.io/claude-marketplace-registry](https://shrwnsan.github.io/claude-marketplace-registry/plugins/1370403780-agent-flow),
+[slopshopper.com](https://www.slopshopper.com/mods/charlie0113-t-claude-agent-flow/).
+
+**Articles:**
+[Best Claude Code Mods and Where to Find Them](https://capitalandcompute.net/blog/best-claude-code-mods/) (capitalandcompute.net),
+[Best Claude Code Mods to Try First (October 2026)](https://stashbase.ai/blog/best-claude-code-mods/) (stashbase.ai).
+
+**Lists on GitHub:**
+[26medias/awesome-ai-repos](https://github.com/26medias/awesome-ai-repos/blob/main/types/plugin-extension.md),
+[ianwieds/awesome-claude-code](https://github.com/ianwieds/awesome-claude-code),
+[karanb192/awesome-claude-code-mods](https://github.com/karanb192/awesome-claude-code-mods),
+[lycfyi/awesome-claude-code-mods](https://github.com/lycfyi/awesome-claude-code-mods),
+[saksham10arora-dotcom/awesome-claude-mods](https://github.com/saksham10arora-dotcom/awesome-claude-mods),
+[shuizhengqi1/cc-mod-hub](https://github.com/shuizhengqi1/cc-mod-hub).
 
 ## Tests
 
