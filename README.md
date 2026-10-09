@@ -1,9 +1,6 @@
-<img width="16" height="16" alt="claudecode" src="https://github.com/user-attachments/assets/958e0b58-fcbb-4f1b-ae53-54a659e842cf" /><div align="center">
+<div align="center">
 
-# agent-flow
-
-![Uploading claudecode.svg…]<svg fill="currentColor" fill-rule="evenodd" height="1em" style="flex:none;line-height:1" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><title>Claude Code</title><path clip-rule="evenodd" d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"></path></svg>()
-
+# <img src="assets/claude-code.svg" width="32" height="32" alt=""> agent-flow
 
 A live tree of the session's subagents beside the transcript, as a Claude Code mod.
 
